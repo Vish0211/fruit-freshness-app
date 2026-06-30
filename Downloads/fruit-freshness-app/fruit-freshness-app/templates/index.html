@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Freshness Inspector</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">FI</span>
+      <span class="brand-name">Freshness&nbsp;Inspector</span>
+    </div>
+    <span class="ledger-tag">No.&nbsp;001 — Produce&nbsp;Grading&nbsp;Line</span>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Upload &middot; Inspect &middot; Grade</p>
+      <h1>Drop a fruit photo.<br>Get a grade.</h1>
+      <p class="lede">A neural network looks at your photo and decides: fresh enough to eat, or past its prime. Built with PyTorch, trained on real produce photos.</p>
+    </section>
+
+    <section class="station">
+
+      <!-- Upload tray -->
+      <div class="tray" id="dropzone">
+        <input type="file" id="fileInput" accept="image/png, image/jpeg, image/webp" hidden>
+
+        <div class="tray-empty" id="trayEmpty">
+          <svg class="tray-icon" width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="4" width="48" height="48" rx="4" stroke="currentColor" stroke-width="2" stroke-dasharray="4 4"/>
+            <path d="M28 20v16M20 28h16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+          <p class="tray-title">Drag a photo here</p>
+          <p class="tray-sub">or click to browse — PNG, JPG, WEBP</p>
+        </div>
+
+        <div class="tray-preview" id="trayPreview" hidden>
+          <img id="previewImg" alt="Uploaded fruit" />
+        </div>
+      </div>
+
+      <!-- Result panel -->
+      <div class="result-panel" id="resultPanel">
+
+        <div class="result-idle" id="resultIdle">
+          <p>Waiting on a sample.</p>
+          <p class="result-idle-sub">Your grade will appear here.</p>
+        </div>
+
+        <div class="result-loading" id="resultLoading" hidden>
+          <div class="spinner"></div>
+          <p>Running inference…</p>
+        </div>
+
+        <div class="result-data" id="resultData" hidden>
+          <div class="stamp" id="stamp">FRESH</div>
+
+          <p class="fruit-name" id="fruitName">Apple</p>
+
+          <div class="gauge">
+            <svg viewBox="0 0 200 110" id="gaugeSvg">
+              <path d="M 15 100 A 85 85 0 0 1 185 100" fill="none" stroke="var(--line)" stroke-width="14" stroke-linecap="round"/>
+              <path d="M 15 100 A 85 85 0 0 1 185 100" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="round"
+                    id="gaugeArc" stroke-dasharray="267" stroke-dashoffset="267"/>
+              <line x1="100" y1="100" x2="100" y2="35" id="gaugeNeedle" stroke="var(--ink)" stroke-width="3" stroke-linecap="round" transform="rotate(-90 100 100)"/>
+              <circle cx="100" cy="100" r="6" fill="var(--ink)"/>
+            </svg>
+            <p class="gauge-label"><span id="confidenceValue">0</span>% confident</p>
+          </div>
+
+          <div class="breakdown" id="breakdown"></div>
+
+          <button class="btn-secondary" id="resetBtn">Inspect another</button>
+        </div>
+
+        <div class="result-error" id="resultError" hidden>
+          <p id="errorText">Something went wrong.</p>
+        </div>
+
+      </div>
+
+    </section>
+
+    {% if not model_ready %}
+    <section class="warning-banner">
+      <strong>No trained model found yet.</strong> Run <code>python train_model.py</code> first, then restart this app. See README.md for the full guide.
+    </section>
+    {% endif %}
+
+    <section class="how">
+      <h2>How this works</h2>
+      <div class="how-grid">
+        <div class="how-step">
+          <span class="how-num">01</span>
+          <h3>Pretrained eyes</h3>
+          <p>A ResNet18 network, already trained on 1.2M photos, supplies the base visual understanding — edges, shapes, texture.</p>
+        </div>
+        <div class="how-step">
+          <span class="how-num">02</span>
+          <h3>Fine-tuned on fruit</h3>
+          <p>Its final layers were retrained on labeled photos of fresh and rotten produce until it learned what spoilage looks like.</p>
+        </div>
+        <div class="how-step">
+          <span class="how-num">03</span>
+          <h3>Your photo, graded</h3>
+          <p>Your upload is resized, normalized, and passed through the network, which returns a fruit type and a freshness call.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Built with PyTorch + torchvision + Flask.</p>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
